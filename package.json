@@ -1,0 +1,19 @@
+{
+  "author": "Craig DeGruchy <cdegruchy@logitech.com>",
+  "name": "device-service",
+  "description": "Package containing foo components",
+  "version": "99.99.99",
+  "repository": {
+    "type": "git",
+    "url": "ssh://cdegruchy@gerrit.logitech.com:29418/dhg/server/device-service"
+  },
+  "engines": {
+    "node": "v0.4.12"
+  },
+  "bin": {
+    "device-service": "./device-service.js"
+  },
+  "dependencies": {
+    "express": "3.x"
+  }
+}
