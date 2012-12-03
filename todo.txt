@@ -1,0 +1,6 @@
+﻿- add DTO conversion for language - add processing of keycode to code
+- add DTO conversion for protocol - add binarization
+- verify DTO conversion for device
+- add caching in mongo
+- add security
+- change to using JSON2 endpont - need to add support for simplified versionId strong type
