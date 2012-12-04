@@ -17,37 +17,57 @@ exports.findById = function (req, res) {
         }
     },
     function (err, results) {
-        res.send(ToDevice(results.globalDevice, results.globalFeatures));
+        res.send(toDevice(results.globalDevice, results.globalFeatures));
     });
 };
 
-ToDevice = function (globalDevice, globalFeatures) {
+function toDevice(globalDevice, globalFeatures) {
     var device = {
-        "Id": globalDevice.Id,
-        "GlobalDeviceVersionIds": globalDevice.GlobalDeviceVersionIds,
+        "GlobalDeviceId": globalDevice.Id,
         "DefaultGlobalLanguageVersionId": globalDevice.DefaultGlobalLanguageVersionId,
         "DeviceType": globalDevice.DeviceType,
-        "EdidInformation": globalDevice.EdidInformation,
-        "HdmiCecDetail": globalDevice.HdmiCecDetail,
-        "HoldMinRepeats": globalDevice.HoldMinRepeats,
-        "MinRepeats": globalDevice.MinRepeats,
-        "HoldDelay": globalDevice.HoldDelay,
-        "InterDeviceDelay": globalDevice.InterDeviceDelay,
-        "InterKeyDelay": globalDevice.InterKeyDelay,
-        "IsInterKeyDelayOptimized": globalDevice.IsInterKeyDelayOptimized,
         "IsMultiCode": globalDevice.IsMultiCode,
-        "PrimaryManufacturerAlias": globalDevice.PrimaryManufacturerAlias,
-        "PrimaryModelAlias": globalDevice.PrimaryModelAlias,
-        "State": globalDevice.State,
-        "VersionId": globalDevice.VersionId
+        "Id": globalDevice.VersionId
     };
 
     globalFeatures[0].Value.forEach(function (globalFeature) {
-        console.log(globalFeature);
+        if (globalFeature.__type.indexOf("PowerFeature") !== -1) {
+            var feature = {
+                "__type": "PowerFeature",
+                "DefaultPowerOnDelay": globalFeature.DefaultPowerOnDelay,
+                "HasAdditionalActions": globalFeature.HasAdditionalActions,
+                "IsPowerAlwaysOn": globalFeature.IsPowerAlwaysOn,
+                "PowerOnDelay": globalFeature.PowerOnDelay,
+                "PowerOffActions": globalFeature.PowerOffActions != null ? cleanupActionList(globalFeature.PowerOffActions) : null,
+                "PowerOnActions": globalFeature.PowerOnActions != null ? cleanupActionList(globalFeature.PowerOnActions) : null,
+                "PowerOnResetActions": globalFeature.PowerOnResetActions != null ? cleanupActionList(globalFeature.PowerOnResetActions) : null,
+                "PowerToggleActions": globalFeature.PowerToggleActions != null ? cleanupActionList(globalFeature.PowerToggleActions) : null,
+                "PowerTypeId": globalFeature.PowerTypeId
+            };
 
-        if (globalFeature.__type.indexOf("PowerFeature") !== -1)
-            device["PowerFeature"] = globalFeature;
+            device["PowerFeature"] = feature;
+        };
     });
 
     return device;
 };
+
+function cleanupActionList(actions) {
+    actions.sort(compareOrder);
+
+    actions.forEach(function (action) {
+        delete action.ActionId;
+        delete action.Order;
+        action["__type"] = action["__type"].split(":#")[0];
+    });
+
+    return actions;
+};
+
+function compareOrder(a,b) {
+  if (a.Order < b.Order)
+     return -1;
+  if (a.Order > b.Order)
+    return 1;
+  return 0;
+}
